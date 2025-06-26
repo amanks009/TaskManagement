@@ -15,6 +15,9 @@ app.use(express.json());
 
 // Routes
 app.use("/tasks", taskRoutes);
+app.get("/", (_req, res) => {
+  res.send("API is running 🚀");
+});
 
 // Start server
 app.listen(port, () => {

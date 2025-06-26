@@ -17,30 +17,41 @@ import { Task } from '../types/task';
 interface UpdatedTaskData {
   title: string;
   description: string;
-  status: Task["status"];
+  status: Task['status'];
 }
 
 interface CreateTaskFormProps {
-  onSuccess: (newTask: Task) => void;
+  onSuccess: (task: Task) => void;
   initialValues?: UpdatedTaskData;
+  editingTaskId?: number;
 }
 
-const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onSuccess, initialValues }) => {
+const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
+  onSuccess,
+  initialValues,
+  editingTaskId,
+}) => {
   const [title, setTitle] = useState(initialValues?.title || '');
   const [description, setDescription] = useState(initialValues?.description || '');
-  const [status, setStatus] = useState<Task["status"]>(initialValues?.status || 'pending');
+  const [status, setStatus] = useState<Task['status']>(initialValues?.status || 'pending');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    const url = editingTaskId
+  ? `${baseUrl}/tasks/${editingTaskId}`
+  : `${baseUrl}/tasks`;
+
+    const method = editingTaskId ? 'PUT' : 'POST';
+
     try {
-      // Send a POST request to create a new task
-      const response = await fetch('http://localhost:5000/tasks', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -48,16 +59,14 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onSuccess, initialValue
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create task');
+        throw new Error(editingTaskId ? 'Failed to update task' : 'Failed to create task');
       }
 
-      const createdTask = await response.json();
+      const task = await response.json();
+      onSuccess(task);
 
-      // Trigger the parent callback with new task
-      onSuccess(createdTask);
-
-      // Clear form only if it's not in edit mode
-      if (!initialValues) {
+      // Clear form only if creating
+      if (!editingTaskId) {
         setTitle('');
         setDescription('');
         setStatus('pending');
@@ -74,7 +83,7 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onSuccess, initialValue
     <Box component="form" onSubmit={handleSubmit}>
       <Stack gap="sm">
         <Text size="lg" fw={600}>
-          {initialValues ? 'Edit Task' : 'Create a Task'}
+          {editingTaskId ? 'Edit Task' : 'Create a Task'}
         </Text>
 
         {error && <Text c="red" size="sm">{error}</Text>}
@@ -96,10 +105,10 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onSuccess, initialValue
         <Select
           label="Status"
           value={status}
-          onChange={(value) => setStatus(value as Task["status"])}
+          onChange={(value) => setStatus(value as Task['status'])}
           data={[
             { value: 'pending', label: 'Pending' },
-            { value: 'completed', label: 'Completed' },
+            { value: 'done', label: 'Done' },
           ]}
           required
         />
@@ -120,7 +129,7 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onSuccess, initialValue
                 <Loader size="xs" color="white" />
                 Submitting...
               </Group>
-            ) : 'Submit'}
+            ) : editingTaskId ? 'Update' : 'Create'}
           </Button>
         </Group>
       </Stack>

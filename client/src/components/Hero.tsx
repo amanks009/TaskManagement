@@ -22,11 +22,12 @@ const Hero = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   // Fetch all tasks from backend
   const fetchTasks = async () => {
     try {
-      const response = await fetch('http://localhost:5000/tasks');
+      const response = await fetch(`${baseUrl}/tasks`);
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
       setTasks(data);

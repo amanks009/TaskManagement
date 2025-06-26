@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2018"],
     "outDir": "dist",
-    "rootDir": "./",
+    "rootDir": "src",
     "esModuleInterop": true,
     "moduleResolution": "node",
     "baseUrl": "./",
@@ -12,6 +12,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src", "prisma"],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }

@@ -52,7 +52,7 @@ const Hero = () => {
   // Delete task handler
   const handleDeleteTask = async (taskId: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
+      const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete task');
@@ -66,7 +66,7 @@ const Hero = () => {
   // Update task handler
   const handleUpdateTask = async (updatedTask: Task) => {
     try {
-      const response = await fetch(`http://localhost:5000/tasks/${updatedTask.id}`, {
+      const response = await fetch(`${baseUrl}/tasks/${updatedTask.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
